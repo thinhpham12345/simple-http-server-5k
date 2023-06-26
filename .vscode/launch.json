@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "configurations": [
+      {
+        "name": "Debug",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "./build/simple-tcp-server",
+        "cwd": "${workspaceRoot}"
+      },
+      {
+        "name": "Run Unit Tests",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "./build/simple-tcp-server-tests",
+        "cwd": "${workspaceRoot}"
+      }
+    ]
+}
