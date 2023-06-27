@@ -6,7 +6,7 @@
 #include <functional>
 #include <list>
 
-#define ConnectionHandler_t std::function<void(int socket_id, std::string &req, ISocket *socket)>
+#define ConnectionHandler_t std::function<void(int socket_id, std::string &req)>
 
 namespace tcp
 {
@@ -15,7 +15,6 @@ namespace tcp
     public:
         virtual int CreateSocket(std::uint16_t port) = 0;
         virtual void OnReceived(ConnectionHandler_t handler) = 0;
-        virtual void OnBroadcast(ConnectionHandler_t handler) = 0;
 
     public:
         virtual bool Recv(int client_socket_id, char *buffer, size_t buffer_size, ssize_t &read_bytes) = 0;
@@ -25,6 +24,7 @@ namespace tcp
 
     public:
         virtual bool IsListening() = 0;
+        virtual std::list<int> Clients() = 0;
     };
 }
 

@@ -136,11 +136,6 @@ namespace tcp
         _connection_handler = handler;
     }
 
-    void EpollSocket::OnBroadcast(ConnectionHandler_t handler)
-    {
-        _broadcast_handler = handler;
-    }
-
     bool EpollSocket::Recv(int client_socket_id, char *buffer, size_t buffer_size, ssize_t &read_bytes)
     {
         read_bytes = recv(client_socket_id, buffer, buffer_size, 0);
@@ -181,7 +176,6 @@ namespace tcp
         if (client_socket_id == -1)
         {
             log(ERROR) << "Invalid client socket id " << client_socket_id << "\n";
-            exit(0);
             return;
         }
 
@@ -199,6 +193,8 @@ namespace tcp
             log(ERROR) << "Cannot enable edge-triggered mode for client socket id " << client_socket_id << "\n";
             return;
         }
+
+        _connected_clients.push_back(client_socket_id);
     }
 
     void EpollSocket::_HandleIncomingData(int client_socket_id)
@@ -224,15 +220,7 @@ namespace tcp
         {
             log(INFO) << "data: " << data << "\n";
             if (_connection_handler)
-                _connection_handler(client_socket_id, data, this);
-
-            if (_broadcast_handler)
-            {
-                for (auto &client_id : _connected_clients)
-                {
-                    _broadcast_handler(client_id, data, this);
-                }
-            }
+                _connection_handler(client_socket_id, data);
             return;
         }
 

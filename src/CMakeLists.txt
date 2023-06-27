@@ -7,6 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
+#======================= Simple TCP Server =====================
+
 file(GLOB src_files "${PROJECT_SOURCE_DIR}/src/*.hpp"
                     "${PROJECT_SOURCE_DIR}/src/*.cpp"
                     "${PROJECT_SOURCE_DIR}/src/*/*.hpp"

@@ -10,30 +10,28 @@
 #include "./constants.hpp"
 #include "./sockets/isocket.hpp"
 
-#define EndpointCallback_t std::function<std::string(std::string &)>
-#define BroadcastCallback_t std::function<void(std::string &, ISocket *)>
+#define DataCallback_t std::function<std::string(std::string &)>
 
 namespace tcp
 {
     class TCPServer
     {
     public:
-        TCPServer();
+        TCPServer(bool enable_broadcast = false);
         ~TCPServer();
 
     public:
         bool Listen(std::uint16_t port);
-        void OnReceive(EndpointCallback_t callback);
-        void OnBroadcast(BroadcastCallback_t callback);
+        void OnReceive(DataCallback_t callback);
         void Stop();
 
     private:
         std::unique_ptr<ISocket> _socket_ptr;
+        bool _is_broadcasting;
 
     private:
         std::mutex _response_mutex;
-        EndpointCallback_t _handler;
-        BroadcastCallback_t _broadcast_handler;
+        DataCallback_t _handler;
     };
 }
 

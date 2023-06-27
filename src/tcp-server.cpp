@@ -7,9 +7,10 @@ using ThreadsPool = utils::ThreadsPool;
 
 namespace tcp
 {
-    TCPServer::TCPServer()
+    TCPServer::TCPServer(bool enable_broadcast)
     {
         _socket_ptr = std::make_unique<EpollSocket>(MAX_ASYNC_EVENTS_QUEUE_SIZE);
+        _is_broadcasting = enable_broadcast;
     }
 
     TCPServer::~TCPServer()
@@ -25,25 +26,27 @@ namespace tcp
 
         if (_handler)
         {
-            _socket_ptr->OnReceived([&pool, this](int socket_id, std::string &req, ISocket *socket)
+            _socket_ptr->OnReceived([&pool, this](int socket_id, std::string &req)
                                     {
                                         log(INFO) << "OnConnection socket_id " << socket_id << " data " << req << "\n";
 
-                                        pool.Enqueue([this, socket_id, &req, socket]() {
+                                        pool.Enqueue([this, socket_id, &req]() {
                                             auto response = _handler(req);
-                                            socket->Send(socket_id, response + END_OF_TCP_STREAM);
-                                        }); });
-        }
 
-        if (_broadcast_handler)
-        {
-            _socket_ptr->OnBroadcast([&pool, this](int socket_id, std::string &req, ISocket *socket)
-                                     {
-                                        log(INFO) << "OnConnection socket_id " << socket_id << " data " << req << "\n";
-
-                                        pool.Enqueue([this, socket_id, &req, socket]() {
-                                            auto response = _handler(req);
-                                            socket->Send(socket_id, response + END_OF_TCP_STREAM);
+                                            if (_is_broadcasting)
+                                            {
+                                                for (auto &client_id : _socket_ptr->Clients())
+                                                {
+                                                    if (client_id != socket_id)
+                                                    {
+                                                        _socket_ptr->Send(client_id, response + END_OF_TCP_STREAM);
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                _socket_ptr->Send(socket_id, response + END_OF_TCP_STREAM);
+                                            }
                                         }); });
         }
 
@@ -61,14 +64,9 @@ namespace tcp
         return true;
     }
 
-    void TCPServer::OnReceive(EndpointCallback_t callback)
+    void TCPServer::OnReceive(DataCallback_t callback)
     {
         _handler = callback;
-    }
-
-    void TCPServer::OnBroadcast(BroadcastCallback_t callback)
-    {
-        _broadcast_handler = callback;
     }
 
     void TCPServer::Stop()

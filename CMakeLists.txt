@@ -6,3 +6,6 @@ include(src/CMakeLists.txt)
 
 # Include the CMakeLists.txt for simple-tcp-server-tests
 include(tests/CMakeLists.txt)
+
+# Include the CMakeLists.txt for examples
+include(examples/CMakeLists.txt)

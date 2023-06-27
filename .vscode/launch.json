@@ -9,10 +9,25 @@
         "cwd": "${workspaceRoot}"
       },
       {
+        "name": "Debug Chat Server",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "./build/simple-chat-server",
+        "cwd": "${workspaceRoot}"
+      },
+      {
         "name": "Run Unit Tests",
         "type": "cppdbg",
         "request": "launch",
         "program": "./build/simple-tcp-server-tests",
+        "cwd": "${workspaceRoot}"
+      },
+      {
+        "name": "Debug Specific Unit Test",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "./build/simple-tcp-server-tests",
+        "args": ["--gtest_filter=TCPServerTest.SimpleBroadcastingServer"],
         "cwd": "${workspaceRoot}"
       }
     ]

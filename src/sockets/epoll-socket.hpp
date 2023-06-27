@@ -2,6 +2,7 @@
 #define __EPOLL_SOCKET_HPP__
 
 #include <sys/epoll.h>
+#include <mutex>
 
 #include "./constants.hpp"
 #include "./isocket.hpp"
@@ -18,7 +19,6 @@ namespace tcp
     public:
         int CreateSocket(std::uint16_t port) override;
         void OnReceived(ConnectionHandler_t handler) override;
-        void OnBroadcast(ConnectionHandler_t handler) override;
 
     public:
         bool Recv(int client_socket_id, char *buffer, size_t buffer_size, ssize_t &read_bytes) override;
@@ -28,6 +28,7 @@ namespace tcp
 
     public:
         bool IsListening() override;
+        std::list<int> Clients() { return _connected_clients; }
 
     private:
         int _CreateSocket(std::uint16_t port);
@@ -38,12 +39,13 @@ namespace tcp
         int _socket_id = CLOSED_SOCKET_ID;
         bool _is_listening;
         ConnectionHandler_t _connection_handler;
-        ConnectionHandler_t _broadcast_handler;
 
     private:
         int _epoll_fd;
         int _max_events;
         std::list<int> _connected_clients;
+
+        std::mutex _mutex;
     };
 }
 
