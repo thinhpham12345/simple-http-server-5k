@@ -11,6 +11,21 @@
 Default maximum number of descriptor files can be opened in Ubuntu OS is 1024, we must increase this number in order to handle 5k.
 To increase the limitation, run `ulimit -n 10000`
 
+# How to compile?
+
+## Option 1: VSCode and CMake extension
+
+- Select `CMake: Build` from VSCode command
+
+![Build option](./build-with-vscode.png "build with VSCode")
+
+## Option 2: Command line
+
+- `mkdir build`
+- `cd build`
+- `cmake ..`
+- `make`
+
 # How to test?
 
 ### With simple spec test file (tcp-server_spec.cpp)

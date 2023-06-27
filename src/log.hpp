@@ -27,7 +27,7 @@ public:
     Logger &operator<<(const T &value)
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        std::cout << value;
+        // std::cout << value;
         return *this;
     }
 
