@@ -9,7 +9,16 @@
 Default maximum number of descriptor files can be opened in Ubuntu OS is 1024, we must increase this number in order to handle 5k.
 To increase the limitation, run `ulimit -n 10000`
 
-# Result
+# How to test?
+
+### With simple spec test file (tcp-server_spec.cpp)
+
+- Compile the project
+- Execute test `./build/simple-tcp-server-tests --gtest_filter=TCPServerTest.SimpleServer`
+- Observe the 5k connections are made
+
+> Unknown issue happens when I run both tests of TCPServerTest at once that causes the test client waits forever.
+> It is not worth taking time to solve it as they can be executed separately. For now, I decide to keep it as is.
 
 ### Benchmarked with simple node client
 
