@@ -12,8 +12,8 @@ int main(int, char **)
 
     TCPServer server;
 
-    server.On([=](std::string &request)
-              { return "OK\n"; });
+    server.OnReceive([=](std::string &request)
+                     { return "OK\n"; });
 
     server.Listen(8080);
 

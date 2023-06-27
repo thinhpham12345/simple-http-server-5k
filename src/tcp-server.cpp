@@ -23,16 +23,29 @@ namespace tcp
         auto number_of_threads_support = THREADS_POOL_SIZE;
         ThreadsPool pool(number_of_threads_support);
 
-        _socket_ptr->OnConnection([&pool, this](int socket_id, std::string &data)
-                                  {
-                                    log(INFO) << "OnConnection socket_id " << socket_id << " data " << data << "\n";
-                                    if (_handler)
+        if (_handler)
+        {
+            _socket_ptr->OnReceived([&pool, this](int socket_id, std::string &req, ISocket *socket)
                                     {
-                                        pool.Enqueue([this, socket_id, &data]() {
-                                            auto response = _handler(data);
-                                            _socket_ptr->Send(socket_id, response + END_OF_TCP_STREAM);
-                                        });
-                                    } });
+                                        log(INFO) << "OnConnection socket_id " << socket_id << " data " << req << "\n";
+
+                                        pool.Enqueue([this, socket_id, &req, socket]() {
+                                            auto response = _handler(req);
+                                            socket->Send(socket_id, response + END_OF_TCP_STREAM);
+                                        }); });
+        }
+
+        if (_broadcast_handler)
+        {
+            _socket_ptr->OnBroadcast([&pool, this](int socket_id, std::string &req, ISocket *socket)
+                                     {
+                                        log(INFO) << "OnConnection socket_id " << socket_id << " data " << req << "\n";
+
+                                        pool.Enqueue([this, socket_id, &req, socket]() {
+                                            auto response = _handler(req);
+                                            socket->Send(socket_id, response + END_OF_TCP_STREAM);
+                                        }); });
+        }
 
         if (_socket_ptr->CreateSocket(port) == CLOSED_SOCKET_ID)
         {
@@ -48,9 +61,14 @@ namespace tcp
         return true;
     }
 
-    void TCPServer::On(EndpointCallback_t endpoint_callback)
+    void TCPServer::OnReceive(EndpointCallback_t callback)
     {
-        _handler = endpoint_callback;
+        _handler = callback;
+    }
+
+    void TCPServer::OnBroadcast(BroadcastCallback_t callback)
+    {
+        _broadcast_handler = callback;
     }
 
     void TCPServer::Stop()

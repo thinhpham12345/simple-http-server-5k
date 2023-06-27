@@ -11,6 +11,7 @@
 #include "./sockets/isocket.hpp"
 
 #define EndpointCallback_t std::function<std::string(std::string &)>
+#define BroadcastCallback_t std::function<void(std::string &, ISocket *)>
 
 namespace tcp
 {
@@ -22,7 +23,8 @@ namespace tcp
 
     public:
         bool Listen(std::uint16_t port);
-        void On(EndpointCallback_t endpoint_callback);
+        void OnReceive(EndpointCallback_t callback);
+        void OnBroadcast(BroadcastCallback_t callback);
         void Stop();
 
     private:
@@ -31,6 +33,7 @@ namespace tcp
     private:
         std::mutex _response_mutex;
         EndpointCallback_t _handler;
+        BroadcastCallback_t _broadcast_handler;
     };
 }
 

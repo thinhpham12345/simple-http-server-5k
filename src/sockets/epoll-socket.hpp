@@ -17,7 +17,10 @@ namespace tcp
 
     public:
         int CreateSocket(std::uint16_t port) override;
-        virtual void OnConnection(NewConnectionHandler_t handler) override;
+        void OnReceived(ConnectionHandler_t handler) override;
+        void OnBroadcast(ConnectionHandler_t handler) override;
+
+    public:
         bool Recv(int client_socket_id, char *buffer, size_t buffer_size, ssize_t &read_bytes) override;
         void Send(int client_socket_id, const std::string &content) override;
         void Close(int client_socket_id) override;
@@ -34,7 +37,8 @@ namespace tcp
     private:
         int _socket_id = CLOSED_SOCKET_ID;
         bool _is_listening;
-        NewConnectionHandler_t _connection_handler;
+        ConnectionHandler_t _connection_handler;
+        ConnectionHandler_t _broadcast_handler;
 
     private:
         int _epoll_fd;

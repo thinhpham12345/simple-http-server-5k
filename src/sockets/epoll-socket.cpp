@@ -131,9 +131,14 @@ namespace tcp
         return _is_listening;
     }
 
-    void EpollSocket::OnConnection(NewConnectionHandler_t handler)
+    void EpollSocket::OnReceived(ConnectionHandler_t handler)
     {
         _connection_handler = handler;
+    }
+
+    void EpollSocket::OnBroadcast(ConnectionHandler_t handler)
+    {
+        _broadcast_handler = handler;
     }
 
     bool EpollSocket::Recv(int client_socket_id, char *buffer, size_t buffer_size, ssize_t &read_bytes)
@@ -215,10 +220,19 @@ namespace tcp
             }
         }
 
-        if (data.size() >= 0 && _connection_handler)
+        if (data.size() >= 0)
         {
             log(INFO) << "data: " << data << "\n";
-            _connection_handler(client_socket_id, data);
+            if (_connection_handler)
+                _connection_handler(client_socket_id, data, this);
+
+            if (_broadcast_handler)
+            {
+                for (auto &client_id : _connected_clients)
+                {
+                    _broadcast_handler(client_id, data, this);
+                }
+            }
             return;
         }
 
