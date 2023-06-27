@@ -1,6 +1,8 @@
 # Env
 
 - GCC 11.3
+- CMake 3.22.1
+- VSCode 1.78.2 with MS C++ Extension Pack
 - Ubuntu 22.04 LTS
 - MSI Modern 15 (i5 1155G7 - 16GB RAM)
 
